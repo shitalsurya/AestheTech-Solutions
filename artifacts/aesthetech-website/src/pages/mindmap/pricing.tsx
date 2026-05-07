@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { loadRazorpayScript } from "@/hooks/use-razorpay";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/use-auth";
 
 const PLANS = [
   { id: "monthly", name: "Monthly", price: "₹299", period: "per month", features: ["Unlimited assessments", "All challenges", "Basic analytics"] },
@@ -14,6 +15,7 @@ const PLANS = [
 
 export default function MindMapPricing() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const createOrder = useCreatePaymentOrder();
   const verifyPayment = useVerifyPayment();
   const queryClient = useQueryClient();
@@ -61,8 +63,8 @@ export default function MindMapPricing() {
             });
           },
           prefill: {
-            name: "User",
-            email: "user@example.com",
+            name: user?.name ?? "",
+            email: user?.email ?? "",
           },
           theme: {
             color: "#6b46c1"
