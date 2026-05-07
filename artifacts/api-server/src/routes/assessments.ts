@@ -89,6 +89,25 @@ router.get("/assessments/my", requireAuth, async (req, res): Promise<void> => {
   res.json(withTitles);
 });
 
+router.get("/assessments/:id/public", async (req, res): Promise<void> => {
+  const id = Number(req.params.id);
+  if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
+
+  const [assessment] = await db.select().from(assessmentsTable).where(eq(assessmentsTable.id, id));
+  if (!assessment) { res.status(404).json({ error: "Assessment not found" }); return; }
+
+  if (assessment.isPremium) { res.status(403).json({ error: "Premium assessment requires account" }); return; }
+
+  const questions = (assessment.questions as Array<{ id: number; text: string; options: string[]; order: number }>) ?? [];
+  res.json({
+    id: assessment.id,
+    title: assessment.title,
+    description: assessment.description,
+    category: assessment.category,
+    questions,
+  });
+});
+
 router.get("/assessments/:id", requireAuth, async (req, res): Promise<void> => {
   const params = GetAssessmentParams.safeParse(req.params);
   if (!params.success) {

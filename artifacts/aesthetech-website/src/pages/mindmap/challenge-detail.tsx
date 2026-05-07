@@ -5,14 +5,19 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
+import { useGuest } from "@/hooks/use-guest";
+import { GuestUpgradeModal } from "@/components/guest-upgrade-modal";
 
 export default function MindMapChallengeDetail() {
   const { id } = useParams<{ id: string }>();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  
+  const { user } = useAuth();
+  const { saveChallenge } = useGuest();
+
   const { data: challenge, isLoading } = useGetChallenge(Number(id), {
-    query: { enabled: !!id, queryKey: getGetChallengeQueryKey(Number(id)) }
+    query: { enabled: !!id, queryKey: getGetChallengeQueryKey(Number(id)) },
   });
 
   const submitAttempt = useSubmitChallengeAttempt();
@@ -21,6 +26,8 @@ export default function MindMapChallengeDetail() {
   const [timeLeft, setTimeLeft] = useState(0);
   const [isStarted, setIsStarted] = useState(false);
   const [startTime, setStartTime] = useState<number>(0);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [completedResult, setCompletedResult] = useState<{ score: number; total: number; isPassed: boolean } | null>(null);
 
   useEffect(() => {
     if (!challenge || !isStarted) return;
@@ -48,42 +55,66 @@ export default function MindMapChallengeDetail() {
 
   const submitFinal = () => {
     if (!challenge) return;
-    
+
     const timeTaken = Math.floor((Date.now() - startTime) / 1000);
     const formattedAnswers = Object.entries(answers).map(([qId, ans]) => ({
       questionId: Number(qId),
-      answer: ans
+      answer: ans,
     }));
-    
+
+    if (!user) {
+      const score = formattedAnswers.length;
+      const total = challenge.questions.length;
+      const isPassed = score >= Math.ceil(total * 0.6);
+
+      saveChallenge({
+        challengeId: challenge.id,
+        title: challenge.title,
+        score,
+        totalQuestions: total,
+        isPassed,
+        completedAt: new Date().toISOString(),
+      });
+
+      setCompletedResult({ score, total, isPassed });
+      setShowUpgradeModal(true);
+
+      toast({
+        title: isPassed ? "Challenge Complete!" : "Challenge Done",
+        description: `Score: ${score}/${total}. Create an account to save your progress!`,
+      });
+      return;
+    }
+
     submitAttempt.mutate(
       { id: Number(id), data: { answers: formattedAnswers, timeTaken } },
       {
         onSuccess: (result: any) => {
-          toast({ 
-            title: result.isPassed ? "Challenge Passed!" : "Challenge Failed", 
+          toast({
+            title: result.isPassed ? "Challenge Passed!" : "Challenge Failed",
             description: `Score: ${result.score}/${result.totalQuestions}`,
-            variant: result.isPassed ? "default" : "destructive"
+            variant: result.isPassed ? "default" : "destructive",
           });
           setLocation("/mindmap/challenges");
         },
-        onError: () => toast({ title: "Failed to submit", variant: "destructive" })
+        onError: () => toast({ title: "Failed to submit", variant: "destructive" }),
       }
     );
   };
 
   const handleNext = () => {
     if (!challenge) return;
-    
+
     const currentQ = challenge.questions[currentQuestionIdx];
     if (answers[currentQ.id] === undefined) {
       toast({ title: "Please select an answer", variant: "destructive" });
       return;
     }
-    
+
     if (currentQuestionIdx === challenge.questions.length - 1) {
       submitFinal();
     } else {
-      setCurrentQuestionIdx(prev => prev + 1);
+      setCurrentQuestionIdx((prev) => prev + 1);
     }
   };
 
@@ -102,10 +133,18 @@ export default function MindMapChallengeDetail() {
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Time Limit</p>
-            <p className="text-2xl font-bold">{challenge.timeLimit} mins</p>
+            <p className="text-2xl font-bold">{Math.floor(challenge.timeLimit / 60)} mins</p>
           </div>
         </div>
-        <Button size="lg" className="w-full" onClick={() => setIsStarted(true)}>Start Challenge</Button>
+        {!user && (
+          <p className="text-sm text-muted-foreground mb-4">
+            Taking as guest — your score will be saved locally.{" "}
+            <a href="/mindmap/register" className="text-accent underline">Create account</a> to save permanently.
+          </p>
+        )}
+        <Button size="lg" className="w-full" onClick={() => setIsStarted(true)}>
+          Start Challenge
+        </Button>
       </div>
     );
   }
@@ -117,6 +156,13 @@ export default function MindMapChallengeDetail() {
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-3xl">
+      <GuestUpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => { setShowUpgradeModal(false); setLocation("/mindmap/challenges"); }}
+        trigger="save-progress"
+        guestScore={completedResult?.score}
+      />
+
       <div className="flex justify-between items-center mb-8 bg-background/80 backdrop-blur-md p-4 rounded-xl sticky top-20 z-10 border border-white/10">
         <div>
           <h1 className="font-bold">{challenge.title}</h1>
@@ -124,17 +170,17 @@ export default function MindMapChallengeDetail() {
             Question {currentQuestionIdx + 1} of {challenge.questions.length}
           </span>
         </div>
-        <div className="text-xl font-mono font-bold text-accent">
-          {minutes}:{seconds.toString().padStart(2, '0')}
+        <div className={`text-xl font-mono font-bold ${timeLeft < 60 ? "text-red-400" : "text-accent"}`}>
+          {minutes}:{seconds.toString().padStart(2, "0")}
         </div>
       </div>
 
       <div className="glass-card p-8 rounded-2xl">
         <h2 className="text-xl font-medium mb-6">{currentQ.text}</h2>
-        
-        <RadioGroup 
-          value={answers[currentQ.id]?.toString()} 
-          onValueChange={(val) => setAnswers(prev => ({ ...prev, [currentQ.id]: Number(val) }))}
+
+        <RadioGroup
+          value={answers[currentQ.id]?.toString()}
+          onValueChange={(val) => setAnswers((prev) => ({ ...prev, [currentQ.id]: Number(val) }))}
           className="space-y-4"
         >
           {currentQ.options.map((opt, idx) => (
@@ -146,9 +192,9 @@ export default function MindMapChallengeDetail() {
         </RadioGroup>
 
         <div className="mt-8 flex justify-between">
-          <Button 
-            variant="outline" 
-            onClick={() => setCurrentQuestionIdx(prev => Math.max(0, prev - 1))}
+          <Button
+            variant="outline"
+            onClick={() => setCurrentQuestionIdx((prev) => Math.max(0, prev - 1))}
             disabled={currentQuestionIdx === 0}
           >
             Previous

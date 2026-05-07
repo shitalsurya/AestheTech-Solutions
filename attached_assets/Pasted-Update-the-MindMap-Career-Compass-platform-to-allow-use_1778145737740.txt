@@ -1,0 +1,97 @@
+Update the MindMap Career Compass platform to allow users to begin their journey immediately without mandatory registration or login.
+
+Goal:
+Reduce friction and improve user onboarding by allowing users to explore the platform before authentication.
+
+Requirements:
+
+1. Guest User Experience
+   Allow users to:
+
+* Start career assessment quizzes
+* Explore career roadmaps
+* View recommendations
+* Try interview challenges
+* Access limited dashboard preview
+
+without signing in.
+
+2. Smart Authentication Flow
+   Do NOT show login/signup immediately on landing.
+
+Instead:
+
+* Add CTA:
+  “Start Your Journey”
+* Let users experience the platform first
+* Ask for signup/login only when:
+
+  * Saving progress
+  * Unlocking premium features
+  * Accessing detailed reports
+  * Tracking history
+  * Downloading certificates
+
+3. Guest Session Handling
+   Implement temporary guest sessions using:
+
+* localStorage/session storage
+  OR
+* anonymous Supabase sessions
+
+Store:
+
+* quiz progress
+* temporary recommendations
+* challenge scores
+
+4. Conversion-Oriented Upgrade Prompts
+   After users complete key actions:
+
+* Show elegant modal/popups:
+  “Save your progress”
+  “Unlock full roadmap”
+  “Track your interview growth”
+  “Access premium career insights”
+
+Keep UI modern and non-intrusive.
+
+5. Dashboard Preview for Guests
+   Allow guest users to see:
+
+* sample analytics
+* career insights preview
+* roadmap previews
+* challenge performance summary
+
+Blur or partially lock premium areas with:
+“Create free account to continue”
+
+6. Premium UX Design
+   Use:
+
+* smooth animations
+* modern onboarding flow
+* glassmorphism modals
+* progress indicators
+* engaging transitions
+
+The experience should feel like a premium SaaS onboarding flow similar to modern EdTech startups.
+
+7. Authentication Upgrade Flow
+   When guest converts to registered user:
+
+* Migrate guest progress to their account
+* Preserve assessments and challenge history
+* Seamless transition without data loss
+
+8. Mobile UX
+   Ensure guest onboarding flow is:
+
+* fast
+* minimal friction
+* highly responsive
+* optimized for mobile users
+
+Final Goal:
+Users should feel immediate value from the platform before being asked to register, increasing engagement and conversion while maintaining a premium user experience.

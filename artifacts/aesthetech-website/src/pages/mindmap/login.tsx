@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { clearGuestSession } from "@/hooks/use-guest";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -29,23 +30,21 @@ export default function MindMapLogin() {
   const onSubmit = (values: z.infer<typeof loginSchema>) => {
     loginMutation.mutate({ data: values }, {
       onSuccess: (data) => {
+        clearGuestSession();
         login(data.token, data.user);
         setLocation("/mindmap/dashboard");
       },
       onError: (err: any) => {
-        toast({
-          title: "Login failed",
-          description: err?.error || "Invalid credentials",
-          variant: "destructive"
-        });
-      }
+        const message = err?.data?.error || err?.message || "Invalid credentials";
+        toast({ title: "Login failed", description: message, variant: "destructive" });
+      },
     });
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative">
       <div className="absolute inset-0 -z-10 bg-[url('/src/assets/images/hero-mindmap.png')] bg-cover bg-center opacity-20 mix-blend-screen blur-sm" />
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md glass-card p-8 rounded-3xl border-t-2 border-t-accent"
@@ -64,7 +63,7 @@ export default function MindMapLogin() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="name@example.com" {...field} className="bg-background/50" />
+                    <Input placeholder="name@example.com" autoComplete="email" {...field} className="bg-background/50" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -80,7 +79,7 @@ export default function MindMapLogin() {
                     <Link href="#" className="text-xs text-accent hover:underline">Forgot password?</Link>
                   </div>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} className="bg-background/50" />
+                    <Input type="password" placeholder="••••••••" autoComplete="current-password" {...field} className="bg-background/50" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -93,7 +92,8 @@ export default function MindMapLogin() {
         </Form>
 
         <div className="mt-8 text-center text-sm text-muted-foreground">
-          Don't have an account? <Link href="/mindmap/register" className="text-accent font-medium hover:underline">Register</Link>
+          Don't have an account?{" "}
+          <Link href="/mindmap/register" className="text-accent font-medium hover:underline">Register</Link>
         </div>
       </motion.div>
     </div>

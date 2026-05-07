@@ -22,13 +22,18 @@ import MindMapRegister from "@/pages/mindmap/register";
 import MindMapDashboard from "@/pages/mindmap/dashboard";
 import MindMapAssessments from "@/pages/mindmap/assessments";
 import MindMapAssessmentDetail from "@/pages/mindmap/assessment-detail";
+import GuestAssessmentPage from "@/pages/mindmap/guest-assessment";
 import MindMapChallenges from "@/pages/mindmap/challenges";
 import MindMapChallengeDetail from "@/pages/mindmap/challenge-detail";
 import MindMapPricing from "@/pages/mindmap/pricing";
 import MindMapAdmin from "@/pages/mindmap/admin";
 import MindMapProfile from "@/pages/mindmap/profile";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: 1, staleTime: 30_000 },
+  },
+});
 
 function Router() {
   return (
@@ -46,22 +51,20 @@ function Router() {
         <Route path="/mindmap/register" component={MindMapRegister} />
         <Route path="/mindmap/pricing" component={MindMapPricing} />
 
-        {/* MindMap Protected */}
-        <Route path="/mindmap/dashboard">
-          {() => <ProtectedRoute><MindMapDashboard /></ProtectedRoute>}
-        </Route>
-        <Route path="/mindmap/assessments">
-          {() => <ProtectedRoute><MindMapAssessments /></ProtectedRoute>}
-        </Route>
+        {/* MindMap — open to guests */}
+        <Route path="/mindmap/dashboard" component={MindMapDashboard} />
+        <Route path="/mindmap/assessments" component={MindMapAssessments} />
+        <Route path="/mindmap/challenges" component={MindMapChallenges} />
+
+        {/* Guest assessment flow (no session required) */}
+        <Route path="/mindmap/assessments/try/:id" component={GuestAssessmentPage} />
+
+        {/* MindMap — auth required */}
         <Route path="/mindmap/assessments/:id">
           {() => <ProtectedRoute><MindMapAssessmentDetail /></ProtectedRoute>}
         </Route>
-        <Route path="/mindmap/challenges">
-          {() => <ProtectedRoute><MindMapChallenges /></ProtectedRoute>}
-        </Route>
-        <Route path="/mindmap/challenges/:id">
-          {() => <ProtectedRoute><MindMapChallengeDetail /></ProtectedRoute>}
-        </Route>
+        <Route path="/mindmap/challenges/:id" component={MindMapChallengeDetail} />
+
         <Route path="/mindmap/profile">
           {() => <ProtectedRoute><MindMapProfile /></ProtectedRoute>}
         </Route>
