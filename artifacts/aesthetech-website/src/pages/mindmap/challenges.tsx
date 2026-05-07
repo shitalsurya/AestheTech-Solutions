@@ -10,13 +10,17 @@ import { GuestUpgradeModal } from "@/components/guest-upgrade-modal";
 import { Lock } from "lucide-react";
 
 export default function MindMapChallenges() {
-  const { data: challenges, isLoading: challengesLoading } = useListChallenges({}, {
+  const { data: rawChallenges, isLoading: challengesLoading, isError: challengesError } = useListChallenges({}, {
     query: { queryKey: getListChallengesQueryKey() },
   });
 
-  const { data: leaderboard, isLoading: leaderboardLoading } = useGetLeaderboard({
+  const { data: rawLeaderboard, isLoading: leaderboardLoading } = useGetLeaderboard({
     query: { queryKey: getGetLeaderboardQueryKey() },
   });
+
+  // Guard: only use the data if it's actually an array
+  const challenges = Array.isArray(rawChallenges) ? rawChallenges : undefined;
+  const leaderboard = Array.isArray(rawLeaderboard) ? rawLeaderboard : undefined;
 
   const { user } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
@@ -59,6 +63,16 @@ export default function MindMapChallenges() {
         <TabsContent value="challenges">
           {challengesLoading ? (
             <div className="py-8 text-center">Loading challenges...</div>
+          ) : challengesError || (!challengesLoading && !challenges) ? (
+            <div className="glass-card p-12 rounded-2xl text-center text-muted-foreground">
+              <p className="text-lg font-medium mb-2">Could not load challenges</p>
+              <p className="text-sm">Please try refreshing the page.</p>
+            </div>
+          ) : challenges && challenges.length === 0 ? (
+            <div className="glass-card p-12 rounded-2xl text-center text-muted-foreground">
+              <p className="text-lg font-medium mb-2">No challenges available yet</p>
+              <p className="text-sm">Check back soon — challenges are added regularly.</p>
+            </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {challenges?.map((challenge, i) => {

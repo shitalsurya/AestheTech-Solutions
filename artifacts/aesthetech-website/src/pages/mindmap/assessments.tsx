@@ -9,16 +9,19 @@ import { GuestUpgradeModal } from "@/components/guest-upgrade-modal";
 import { Lock } from "lucide-react";
 
 export default function MindMapAssessments() {
-  const { data: assessments, isLoading } = useListAssessments({
+  const { data: rawAssessments, isLoading, isError } = useListAssessments({
     query: { queryKey: getListAssessmentsQueryKey() },
   });
+
+  // Guard: only use the data if it's actually an array (prevents crashes if
+  // the API is unreachable and a non-array value ends up in the cache)
+  const assessments = Array.isArray(rawAssessments) ? rawAssessments : undefined;
 
   const { user } = useAuth();
   const startAssessment = useStartAssessment();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [modalOpen, setModalOpen] = useState(false);
-  const [pendingId, setPendingId] = useState<number | null>(null);
 
   const handleStart = (id: number, isPremium: boolean) => {
     if (!user) {
@@ -67,48 +70,60 @@ export default function MindMapAssessments() {
         <p className="text-muted-foreground text-lg">Evaluate your skills and discover your ideal career path.</p>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {assessments?.map((assessment, i) => (
-          <motion.div
-            key={assessment.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="glass-card p-6 rounded-2xl flex flex-col h-full"
-          >
-            <div className="flex justify-between items-start mb-4">
-              <span className="text-xs font-medium px-2 py-1 bg-primary/20 text-primary rounded-full">
-                {assessment.category}
-              </span>
-              {assessment.isPremium && (
-                <span className="text-xs font-medium px-2 py-1 bg-yellow-500/20 text-yellow-500 rounded-full flex items-center gap-1">
-                  {!user && <Lock className="w-3 h-3" />}
-                  Premium
-                </span>
-              )}
-            </div>
-            <h3 className="text-xl font-bold mb-2">{assessment.title}</h3>
-            <p className="text-muted-foreground text-sm mb-6 flex-1">{assessment.description}</p>
-
-            <div className="flex justify-between text-sm text-muted-foreground mb-6">
-              <span>{assessment.questionCount} Questions</span>
-              <span>~{assessment.estimatedMinutes} mins</span>
-            </div>
-
-            <Button
-              className="w-full rounded-full"
-              onClick={() => handleStart(assessment.id, assessment.isPremium)}
-              disabled={startAssessment.isPending}
+      {isError || (!isLoading && !assessments) ? (
+        <div className="glass-card p-12 rounded-2xl text-center text-muted-foreground">
+          <p className="text-lg font-medium mb-2">Could not load assessments</p>
+          <p className="text-sm">Please try refreshing the page. If the problem persists, the server may be temporarily unavailable.</p>
+        </div>
+      ) : assessments && assessments.length === 0 ? (
+        <div className="glass-card p-12 rounded-2xl text-center text-muted-foreground">
+          <p className="text-lg font-medium mb-2">No assessments available yet</p>
+          <p className="text-sm">Check back soon — assessments are being added regularly.</p>
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {assessments?.map((assessment, i) => (
+            <motion.div
+              key={assessment.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className="glass-card p-6 rounded-2xl flex flex-col h-full"
             >
-              {assessment.isPremium && !user ? (
-                <><Lock className="w-4 h-4 mr-2" />Unlock Premium</>
-              ) : (
-                "Start Assessment"
-              )}
-            </Button>
-          </motion.div>
-        ))}
-      </div>
+              <div className="flex justify-between items-start mb-4">
+                <span className="text-xs font-medium px-2 py-1 bg-primary/20 text-primary rounded-full">
+                  {assessment.category}
+                </span>
+                {assessment.isPremium && (
+                  <span className="text-xs font-medium px-2 py-1 bg-yellow-500/20 text-yellow-500 rounded-full flex items-center gap-1">
+                    {!user && <Lock className="w-3 h-3" />}
+                    Premium
+                  </span>
+                )}
+              </div>
+              <h3 className="text-xl font-bold mb-2">{assessment.title}</h3>
+              <p className="text-muted-foreground text-sm mb-6 flex-1">{assessment.description}</p>
+
+              <div className="flex justify-between text-sm text-muted-foreground mb-6">
+                <span>{assessment.questionCount} Questions</span>
+                <span>~{assessment.estimatedMinutes} mins</span>
+              </div>
+
+              <Button
+                className="w-full rounded-full"
+                onClick={() => handleStart(assessment.id, assessment.isPremium)}
+                disabled={startAssessment.isPending}
+              >
+                {assessment.isPremium && !user ? (
+                  <><Lock className="w-4 h-4 mr-2" />Unlock Premium</>
+                ) : (
+                  "Start Assessment"
+                )}
+              </Button>
+            </motion.div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
