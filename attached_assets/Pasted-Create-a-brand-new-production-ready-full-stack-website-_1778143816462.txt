@@ -1,0 +1,321 @@
+Create a brand-new, production-ready full-stack website for AesthTech Solutions with modern startup-grade UI/UX, scalable architecture, and integrated product ecosystem.
+
+Primary Domain:
+https://aesthetechsolutions.co.in
+
+Tech Stack:
+
+* React + Vite
+* Tailwind CSS
+* Framer Motion
+* Supabase
+* Razorpay
+* Resend
+* Responsive mobile-first architecture
+* Vercel deployment ready
+
+Goal:
+Build AesthTech Solutions as a modern technology startup website showcasing products, innovation, career platforms, and digital solutions under one ecosystem.
+
+---
+
+## CORE WEBSITE STRUCTURE
+
+1. Home Page
+   Create a premium landing page with:
+
+* Modern hero section
+* Animated gradients
+* Startup-style UI
+* Glassmorphism sections
+* Smooth scrolling
+* Interactive cards
+* Professional typography
+
+Sections:
+
+* Hero
+* About AesthTech Solutions
+* Products & Platforms
+* Services
+* Innovation & Vision
+* Featured Apps
+* Testimonials
+* FAQ
+* Contact
+* Footer
+
+Brand Tone:
+Modern, futuristic, innovative, trustworthy, growth-oriented.
+
+Tagline:
+“Building Digital Solutions for Growth, Awareness & Innovation”
+
+---
+
+## NAVIGATION
+
+Navbar should include:
+
+* Home
+* About
+* Products
+* MindMap Career Compass
+* Apps
+* Contact
+
+---
+
+## PRODUCTS / APPS SHOWCASE
+
+Create a dedicated “Apps & Products” section showcasing:
+
+1. Mantra Guide – Spiritual Guide
+   Type:
+   Android Mobile App
+
+Description:
+A mindfulness and spiritual guidance mobile application helping users build calmness, positivity, and daily spiritual habits.
+
+Add:
+
+* Play Store style cards
+* Screenshots placeholders
+* Features section
+* CTA buttons
+
+2. WhatsToday – NextGen Smart Calendar
+   Type:
+   Android Mobile App
+
+Description:
+A smart awareness-focused calendar application helping users discover historical events, daily significance, and meaningful moments.
+
+Add:
+
+* Modern calendar-themed UI
+* Interactive cards
+* Screenshots placeholders
+* CTA buttons
+
+3. LifeLens – Daily Life Companion
+   Type:
+   Android Mobile App
+
+Description:
+A daily reflection and awareness app encouraging intentional living and mindful habits.
+
+Add:
+
+* Minimal modern UI section
+* Reflection-focused visuals
+* CTA buttons
+
+Each app card should contain:
+
+* App icon placeholder
+* App tagline
+* Feature highlights
+* Google Play Store button
+* “Learn More” button
+
+---
+
+## MINDMAP CAREER COMPASS PLATFORM
+
+Create and deploy a complete premium EdTech platform at:
+
+/MindMapCareerCompass
+
+Inspired by:
+https://mind-map-career-compass--spsuryavanshi26.replit.app
+
+But redesigned with:
+
+* Better UI/UX
+* Premium startup aesthetic
+* Smooth animations
+* Interactive dashboards
+* Framer Motion transitions
+* Fully responsive design
+
+Platform Branding:
+MindMap Career Compass
+
+Tagline:
+“Navigate Your Future with Clarity”
+
+---
+
+## MINDMAP FEATURES
+
+1. Landing Page
+   Include:
+
+* Hero section
+* Career guidance overview
+* Career roadmaps
+* Interview preparation
+* Personalized recommendations
+* Pricing
+* Testimonials
+* FAQ
+
+2. Authentication
+   Implement Supabase Auth:
+
+* Email/password
+* Google login
+* Forgot password
+* Persistent sessions
+
+3. User Dashboard
+   Authenticated users should access:
+
+* Personalized dashboard
+* Saved assessments
+* Career recommendations
+* Interview challenge progress
+* Premium content
+* User profile
+
+4. Career Compass Module
+   Build:
+
+* Career assessment quizzes
+* Stream guidance
+* Domain recommendations
+* AI-style recommendation experience
+* Career roadmap generation
+* Supabase data storage
+
+5. Interview Challenge Platform
+   Include:
+
+* Timed challenges
+* MCQs
+* Coding/interview questions
+* Difficulty levels
+* Score tracking
+* Leaderboard
+* Completion certificate UI
+
+---
+
+## RAZORPAY INTEGRATION
+
+Implement secure Razorpay integration:
+
+* Subscription plans
+* One-time payments
+* Premium unlock flow
+* Secure verification
+* Payment history dashboard
+* Webhook validation
+
+Environment Variables:
+
+* VITE_RAZORPAY_KEY_ID
+* RAZORPAY_KEY_SECRET
+
+---
+
+## RESEND EMAIL SYSTEM
+
+Use Resend for all transactional and funnel emails.
+
+Verified Domain:
+aesthetechsolutions.co.in
+
+From Address:
+[support@aesthetechsolutions.co.in](mailto:support@aesthetechsolutions.co.in)
+
+Implement:
+
+* Welcome emails
+* Signup confirmation
+* Payment confirmation
+* Weekly career tips
+* Interview reminders
+* Quiz completion emails
+* Contact form emails
+* Admin notifications
+
+Use beautifully designed branded HTML templates.
+
+Environment Variable:
+
+* RESEND_API_KEY
+
+---
+
+## ADMIN PANEL
+
+Create secure admin dashboard with:
+
+* User management
+* Payments
+* Quiz analytics
+* Email logs
+* Career content management
+* Platform analytics
+* Subscription management
+
+---
+
+## SUPABASE DATABASE
+
+Create scalable schema for:
+
+* users
+* profiles
+* assessments
+* career_roadmaps
+* interview_challenges
+* payments
+* subscriptions
+* email_logs
+* feedback
+
+---
+
+## DESIGN REQUIREMENTS
+
+* Premium startup-grade UI
+* Framer Motion animations
+* Glassmorphism
+* Smooth hover interactions
+* Responsive on all devices
+* Dark/light mode
+* Clean modern dashboards
+* Professional EdTech + SaaS aesthetic
+
+---
+
+## DEPLOYMENT REQUIREMENTS
+
+* Production-ready codebase
+* Vercel compatible
+* Environment variable support
+* Optimized loading
+* Error handling
+* Toast notifications
+* Secure APIs
+* SEO optimization
+* Reusable scalable architecture
+
+---
+
+## FINAL GOAL
+
+The final result should feel like a polished modern SaaS + EdTech startup ecosystem combining:
+
+* Corporate technology website
+* Mobile app showcase
+* Career guidance platform
+* Interview readiness system
+* Payment infrastructure
+* Automated email funnels
+
+All fully integrated under:
+https://aesthetechsolutions.co.in

@@ -3,20 +3,33 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: AesthTech Solutions API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: users
+    description: User profile operations
+  - name: assessments
+    description: Career assessment operations
+  - name: challenges
+    description: Interview challenge operations
+  - name: payments
+    description: Payment operations
+  - name: contact
+    description: Contact form operations
+  - name: admin
+    description: Admin panel operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +37,485 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # Auth
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterBody"
+      responses:
+        "201":
+          description: User registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login with email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Users
+  /users/profile:
+    patch:
+      operationId: updateProfile
+      tags: [users]
+      summary: Update user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileBody"
+      responses:
+        "200":
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+  /users/stats:
+    get:
+      operationId: getUserStats
+      tags: [users]
+      summary: Get dashboard statistics for current user
+      responses:
+        "200":
+          description: User statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserStats"
+
+  # Assessments
+  /assessments:
+    get:
+      operationId: listAssessments
+      tags: [assessments]
+      summary: List all career assessments
+      responses:
+        "200":
+          description: List of assessments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Assessment"
+
+    post:
+      operationId: startAssessment
+      tags: [assessments]
+      summary: Start a new assessment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StartAssessmentBody"
+      responses:
+        "201":
+          description: Assessment started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessmentSession"
+
+  /assessments/{id}:
+    get:
+      operationId: getAssessment
+      tags: [assessments]
+      summary: Get assessment by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Assessment details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessmentSession"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /assessments/{id}/submit:
+    post:
+      operationId: submitAssessment
+      tags: [assessments]
+      summary: Submit assessment answers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitAssessmentBody"
+      responses:
+        "200":
+          description: Assessment result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessmentResult"
+
+  /assessments/my:
+    get:
+      operationId: listMyAssessments
+      tags: [assessments]
+      summary: List current user's assessments
+      responses:
+        "200":
+          description: User's assessments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AssessmentSession"
+
+  # Challenges
+  /challenges:
+    get:
+      operationId: listChallenges
+      tags: [challenges]
+      summary: List interview challenges
+      parameters:
+        - name: difficulty
+          in: query
+          schema:
+            type: string
+            enum: [easy, medium, hard]
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of challenges
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Challenge"
+
+  /challenges/{id}:
+    get:
+      operationId: getChallenge
+      tags: [challenges]
+      summary: Get challenge by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Challenge details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChallengeWithQuestions"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /challenges/{id}/attempt:
+    post:
+      operationId: submitChallengeAttempt
+      tags: [challenges]
+      summary: Submit challenge attempt
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChallengeAttemptBody"
+      responses:
+        "200":
+          description: Attempt result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChallengeAttemptResult"
+
+  /challenges/leaderboard:
+    get:
+      operationId: getLeaderboard
+      tags: [challenges]
+      summary: Get global leaderboard
+      responses:
+        "200":
+          description: Leaderboard entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LeaderboardEntry"
+
+  /challenges/my-attempts:
+    get:
+      operationId: getMyChallengeAttempts
+      tags: [challenges]
+      summary: Get current user's challenge attempts
+      responses:
+        "200":
+          description: User's attempts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChallengeAttemptResult"
+
+  # Payments
+  /payments/create-order:
+    post:
+      operationId: createPaymentOrder
+      tags: [payments]
+      summary: Create a Razorpay payment order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrderBody"
+      responses:
+        "201":
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentOrder"
+
+  /payments/verify:
+    post:
+      operationId: verifyPayment
+      tags: [payments]
+      summary: Verify Razorpay payment signature
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyPaymentBody"
+      responses:
+        "200":
+          description: Payment verified
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentVerification"
+
+  /payments/history:
+    get:
+      operationId: getPaymentHistory
+      tags: [payments]
+      summary: Get payment history for current user
+      responses:
+        "200":
+          description: Payment history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Payment"
+
+  /payments/subscription:
+    get:
+      operationId: getSubscription
+      tags: [payments]
+      summary: Get current user's active subscription
+      responses:
+        "200":
+          description: Active subscription
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+
+  # Contact
+  /contact:
+    post:
+      operationId: submitContact
+      tags: [contact]
+      summary: Submit contact form
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactBody"
+      responses:
+        "200":
+          description: Contact form submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /contact/newsletter:
+    post:
+      operationId: subscribeNewsletter
+      tags: [contact]
+      summary: Subscribe to newsletter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewsletterBody"
+      responses:
+        "200":
+          description: Subscribed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  # Admin
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [admin]
+      summary: Get platform-wide analytics
+      responses:
+        "200":
+          description: Admin statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+
+  /admin/users:
+    get:
+      operationId: listAdminUsers
+      tags: [admin]
+      summary: List all users (admin)
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Users list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUsersResponse"
+
+  /admin/payments:
+    get:
+      operationId: listAdminPayments
+      tags: [admin]
+      summary: List all payments (admin)
+      responses:
+        "200":
+          description: Payments list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Payment"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +526,592 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+    # Auth
+    RegisterBody:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - name
+        - email
+        - password
+
+    LoginBody:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - email
+        - password
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/UserProfile"
+      required:
+        - token
+        - user
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [user, admin]
+        isPremium:
+          type: boolean
+        avatarUrl:
+          type: ["string", "null"]
+        bio:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - email
+        - role
+        - isPremium
+        - createdAt
+
+    UpdateProfileBody:
+      type: object
+      properties:
+        name:
+          type: string
+        bio:
+          type: string
+        phone:
+          type: string
+        avatarUrl:
+          type: string
+
+    UserStats:
+      type: object
+      properties:
+        assessmentsCompleted:
+          type: integer
+        challengesAttempted:
+          type: integer
+        totalScore:
+          type: integer
+        rank:
+          type: ["integer", "null"]
+        streakDays:
+          type: integer
+        isPremium:
+          type: boolean
+      required:
+        - assessmentsCompleted
+        - challengesAttempted
+        - totalScore
+        - streakDays
+        - isPremium
+
+    # Assessments
+    Assessment:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        questionCount:
+          type: integer
+        estimatedMinutes:
+          type: integer
+        isPremium:
+          type: boolean
+      required:
+        - id
+        - title
+        - description
+        - category
+        - questionCount
+        - estimatedMinutes
+        - isPremium
+
+    StartAssessmentBody:
+      type: object
+      properties:
+        assessmentId:
+          type: integer
+      required:
+        - assessmentId
+
+    AssessmentQuestion:
+      type: object
+      properties:
+        id:
+          type: integer
+        text:
+          type: string
+        options:
+          type: array
+          items:
+            type: string
+        order:
+          type: integer
+      required:
+        - id
+        - text
+        - options
+        - order
+
+    AssessmentSession:
+      type: object
+      properties:
+        id:
+          type: integer
+        assessmentId:
+          type: integer
+        assessmentTitle:
+          type: string
+        status:
+          type: string
+          enum: [in_progress, completed]
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssessmentQuestion"
+        startedAt:
+          type: string
+        completedAt:
+          type: ["string", "null"]
+      required:
+        - id
+        - assessmentId
+        - assessmentTitle
+        - status
+        - questions
+        - startedAt
+
+    SubmitAssessmentBody:
+      type: object
+      properties:
+        answers:
+          type: array
+          items:
+            type: object
+            properties:
+              questionId:
+                type: integer
+              answer:
+                type: integer
+            required:
+              - questionId
+              - answer
+      required:
+        - answers
+
+    AssessmentResult:
+      type: object
+      properties:
+        sessionId:
+          type: integer
+        score:
+          type: integer
+        totalQuestions:
+          type: integer
+        recommendations:
+          type: array
+          items:
+            type: string
+        careerMatches:
+          type: array
+          items:
+            type: object
+            properties:
+              career:
+                type: string
+              matchPercent:
+                type: integer
+            required:
+              - career
+              - matchPercent
+        completedAt:
+          type: string
+      required:
+        - sessionId
+        - score
+        - totalQuestions
+        - recommendations
+        - careerMatches
+        - completedAt
+
+    # Challenges
+    Challenge:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+        timeLimit:
+          type: integer
+        questionCount:
+          type: integer
+        isPremium:
+          type: boolean
+        attempts:
+          type: integer
+      required:
+        - id
+        - title
+        - description
+        - category
+        - difficulty
+        - timeLimit
+        - questionCount
+        - isPremium
+        - attempts
+
+    ChallengeQuestion:
+      type: object
+      properties:
+        id:
+          type: integer
+        text:
+          type: string
+        options:
+          type: array
+          items:
+            type: string
+        order:
+          type: integer
+      required:
+        - id
+        - text
+        - options
+        - order
+
+    ChallengeWithQuestions:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+        timeLimit:
+          type: integer
+        isPremium:
+          type: boolean
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChallengeQuestion"
+      required:
+        - id
+        - title
+        - description
+        - category
+        - difficulty
+        - timeLimit
+        - isPremium
+        - questions
+
+    ChallengeAttemptBody:
+      type: object
+      properties:
+        answers:
+          type: array
+          items:
+            type: object
+            properties:
+              questionId:
+                type: integer
+              answer:
+                type: integer
+            required:
+              - questionId
+              - answer
+        timeTaken:
+          type: integer
+      required:
+        - answers
+        - timeTaken
+
+    ChallengeAttemptResult:
+      type: object
+      properties:
+        id:
+          type: integer
+        challengeId:
+          type: integer
+        challengeTitle:
+          type: string
+        score:
+          type: integer
+        totalQuestions:
+          type: integer
+        timeTaken:
+          type: integer
+        rank:
+          type: ["integer", "null"]
+        isPassed:
+          type: boolean
+        completedAt:
+          type: string
+      required:
+        - id
+        - challengeId
+        - challengeTitle
+        - score
+        - totalQuestions
+        - timeTaken
+        - isPassed
+        - completedAt
+
+    LeaderboardEntry:
+      type: object
+      properties:
+        rank:
+          type: integer
+        userId:
+          type: integer
+        userName:
+          type: string
+        avatarUrl:
+          type: ["string", "null"]
+        totalScore:
+          type: integer
+        challengesCompleted:
+          type: integer
+      required:
+        - rank
+        - userId
+        - userName
+        - totalScore
+        - challengesCompleted
+
+    # Payments
+    CreateOrderBody:
+      type: object
+      properties:
+        planId:
+          type: string
+          enum: [monthly, annual, lifetime]
+      required:
+        - planId
+
+    PaymentOrder:
+      type: object
+      properties:
+        orderId:
+          type: string
+        amount:
+          type: integer
+        currency:
+          type: string
+        razorpayKeyId:
+          type: string
+        planId:
+          type: string
+      required:
+        - orderId
+        - amount
+        - currency
+        - razorpayKeyId
+        - planId
+
+    VerifyPaymentBody:
+      type: object
+      properties:
+        razorpayOrderId:
+          type: string
+        razorpayPaymentId:
+          type: string
+        razorpaySignature:
+          type: string
+        planId:
+          type: string
+      required:
+        - razorpayOrderId
+        - razorpayPaymentId
+        - razorpaySignature
+        - planId
+
+    PaymentVerification:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        isPremium:
+          type: boolean
+      required:
+        - success
+        - message
+        - isPremium
+
+    Payment:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        razorpayOrderId:
+          type: string
+        razorpayPaymentId:
+          type: ["string", "null"]
+        amount:
+          type: integer
+        currency:
+          type: string
+        status:
+          type: string
+          enum: [pending, paid, failed]
+        planId:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - userId
+        - razorpayOrderId
+        - amount
+        - currency
+        - status
+        - planId
+        - createdAt
+
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: ["integer", "null"]
+        planId:
+          type: ["string", "null"]
+        isPremium:
+          type: boolean
+        expiresAt:
+          type: ["string", "null"]
+        status:
+          type: string
+      required:
+        - isPremium
+        - status
+
+    # Contact
+    ContactBody:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        subject:
+          type: string
+        message:
+          type: string
+      required:
+        - name
+        - email
+        - subject
+        - message
+
+    NewsletterBody:
+      type: object
+      properties:
+        email:
+          type: string
+      required:
+        - email
+
+    # Admin
+    AdminStats:
+      type: object
+      properties:
+        totalUsers:
+          type: integer
+        premiumUsers:
+          type: integer
+        totalRevenue:
+          type: integer
+        assessmentsCompleted:
+          type: integer
+        challengesAttempted:
+          type: integer
+        recentSignups:
+          type: integer
+        activeSubscriptions:
+          type: integer
+      required:
+        - totalUsers
+        - premiumUsers
+        - totalRevenue
+        - assessmentsCompleted
+        - challengesAttempted
+        - recentSignups
+        - activeSubscriptions
+
+    AdminUsersResponse:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserProfile"
+        total:
+          type: integer
+        page:
+          type: integer
+      required:
+        - users
+        - total
+        - page

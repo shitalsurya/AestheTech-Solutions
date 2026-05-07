@@ -1,0 +1,32 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "JxBnTuXiFn7tD_RcFPCmT"
+uri = "file://artifacts/aesthetech-website/src/assets/images/hero-aesthtech.png"
+type = "image"
+title = "AesthTech Hero Graphic"
+
+[[generated]]
+id = "T58XC7y0OAeQxzbOBNnY8"
+uri = "file://artifacts/aesthetech-website/src/assets/images/app-mantra-guide.png"
+type = "image"
+title = "Mantra Guide App"
+
+[[generated]]
+id = "tnzb3vI4JettDlc0xczFS"
+uri = "file://artifacts/aesthetech-website/src/assets/images/app-whatstoday.png"
+type = "image"
+title = "WhatsToday App"
+
+[[generated]]
+id = "L92cY5RswVfgoxRJoUdyu"
+uri = "file://artifacts/aesthetech-website/src/assets/images/app-lifelens.png"
+type = "image"
+title = "LifeLens App"
+
+[[generated]]
+id = "pJENE5Ajc0mqSjZjufhbd"
+uri = "file://artifacts/aesthetech-website/src/assets/images/hero-mindmap.png"
+type = "image"
+title = "MindMap Hero Graphic"
