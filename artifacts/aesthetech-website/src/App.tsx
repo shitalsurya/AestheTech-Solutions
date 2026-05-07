@@ -5,6 +5,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/use-auth";
 import { Layout } from "@/components/layout";
 import { ProtectedRoute } from "@/components/protected-route";
+import { setAuthTokenGetter } from "@workspace/api-client-react";
+
+setAuthTokenGetter(() => localStorage.getItem("auth_token"));
 
 // Pages
 import NotFound from "@/pages/not-found";
