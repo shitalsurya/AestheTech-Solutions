@@ -20,6 +20,10 @@ if (!isBuild && !basePath) {
   throw new Error("BASE_PATH environment variable is required but was not provided.");
 }
 
+// The API server URL for the dev proxy. Defaults to localhost:8080.
+// Override with API_PROXY_TARGET env var if the API runs on a different port.
+const apiProxyTarget = process.env.API_PROXY_TARGET ?? "http://localhost:8080";
+
 export default defineConfig({
   base: basePath ?? "/",
   plugins: [
@@ -59,6 +63,12 @@ export default defineConfig({
     allowedHosts: true,
     fs: {
       strict: true,
+    },
+    proxy: {
+      "/api": {
+        target: apiProxyTarget,
+        changeOrigin: true,
+      },
     },
   },
   preview: {
