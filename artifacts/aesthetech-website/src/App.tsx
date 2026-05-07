@@ -5,8 +5,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/use-auth";
 import { Layout } from "@/components/layout";
 import { ProtectedRoute } from "@/components/protected-route";
-import { setAuthTokenGetter } from "@workspace/api-client-react";
+import { setAuthTokenGetter, setBaseUrl } from "@workspace/api-client-react";
 
+// In production, VITE_API_URL points to the deployed API server (e.g. on Railway/Render)
+// In development, API calls go to the same origin via the proxy
+if (import.meta.env.VITE_API_URL) {
+  setBaseUrl(import.meta.env.VITE_API_URL);
+}
 setAuthTokenGetter(() => localStorage.getItem("auth_token"));
 
 // Pages
